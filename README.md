@@ -1,4 +1,29 @@
-# Friday Night Funkin
+# Friday Night Funkin 0.2.7.1 - Schmovin'
+
+<p align="center">
+  <img src="https://github.com/4mbr0s3-2/Schmovin/blob/main/SchmovinLogo.png?raw=true" alt="Schmovin' Logo"/>
+</p>
+
+# Schmovin ready!
+
+This repo is a prototype of Vanilla FNF with [Schmovin' Patch 2](https://github.com/4mbr0s3-2/Schmovin/tree/4mbr0s3-2-patch-2) implemented.
+
+The reason I chose patch 2 its because it was the most performant on all targets.
+
+It includes Kade Engine 1.5.3 Input because I felt like it anyways, sustain ends show up on pretty much everywhere lmao
+
+Theres still a lot to fix and improve but for now its working :fire:
+
+You can compile it with the latest flixel without any issues but the project was built using the old HaxeFlixel stack:
+- Openfl 9.1.0
+- Lime 7.9.0
+- Flixel 4.11.0
+- Flixel Addons 2.11.0
+- Flixel UI 2.6.0
+
+That's it for the repo, thanks for passing by!
+
+# Original README
 
 This is the repository for Friday Night Funkin, a game originally made for Ludum Dare 47 "Stuck In a Loop".
 
