@@ -12,10 +12,11 @@ class VSchmovinAdapter extends SchmovinAdapter
 		trace(param);
 	}
 
-	// TODO
+	// TODO? - I'm using some random approach but seems to be working! 
+	// This is used by sustains to render so yeah, Schmovin has been fully implemented now!
 	override function getCrotchetAtTime(time:Float):Float
 	{
-		return 2.0;
+		return Conductor.calculateCrochet(Conductor.getBPMFromSeconds(time).bpm);
 	}
 
 	override function grabScrollSpeed():Float
