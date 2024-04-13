@@ -89,7 +89,9 @@ class PlayState extends MusicBeatState
 	private var iconP2:HealthIcon;
 	public var camHUD:FlxCamera;
 	public var camGame:FlxCamera;
-
+	public var realGameCam:FlxCamera; // Its just the camGame copy by SchmovinInstace
+	public var camOther:FlxCamera;
+	
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
 	var halloweenBG:FlxSprite;
@@ -134,6 +136,11 @@ class PlayState extends MusicBeatState
 		Main.schmovin.afterCameras(camGame, camHUD);
 		FlxG.cameras.add(camHUD);
 
+		// god i hate copycats
+		@:privateAccess
+		realGameCam = Main.schmovin.instance.camGame;
+
+		// Changing this does nothing literally so we gonna stick to it lmao
 		FlxCamera.defaultCameras = [camGame];
 
 		persistentUpdate = true;
@@ -654,14 +661,14 @@ class PlayState extends MusicBeatState
 		add(camFollow);
 		add(camFollowPos);
 
-		FlxG.camera.follow(camFollowPos, LOCKON, 0.04);
-		// FlxG.camera.setScrollBounds(0, FlxG.width, 0, FlxG.height);
+		// Since FlxG.camera seems like ignoring these, we apply it to the camGame copy by SchmovinInstance
+		// This breaks probably most of the stuff (PauseSubState and more shit) - ok it didnt by adding another camera
+		// BUT the movement needs to use the copycat camera so we keeping the zoom for the first cam
+		realGameCam.follow(camFollowPos, LOCKON, 1);
 		FlxG.camera.zoom = defaultCamZoom;
-		FlxG.camera.focusOn(camFollow.getPosition());
+		realGameCam.focusOn(camFollow.getPosition());
 
 		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
-
-		FlxG.fixedTimestep = false;
 
 		healthBarBG = new FlxSprite(0, FlxG.height * 0.9).loadGraphic('assets/images/healthBar.png');
 		healthBarBG.screenCenter(X);
@@ -677,6 +684,7 @@ class PlayState extends MusicBeatState
 
 		scoreTxt = new FlxText(healthBarBG.x + healthBarBG.width - 190, healthBarBG.y + 30, 0, "", 20);
 		scoreTxt.setFormat("assets/fonts/vcr.ttf", 16, FlxColor.WHITE, RIGHT);
+		scoreTxt.setBorderStyle(OUTLINE, FlxColor.BLACK, 1.25); // Thanks Alory/sig7ivan/sig7pro idk what i would do without you bud
 		scoreTxt.scrollFactor.set();
 		add(scoreTxt);
 
@@ -698,6 +706,11 @@ class PlayState extends MusicBeatState
 		doof.cameras = [camHUD];
 
 		Main.schmovin.postUI(this);
+
+		// Fixes PauseSubState using the camGame copy?
+		camOther = new FlxCamera();
+		camOther.bgColor.alpha = 0;
+		FlxG.cameras.add(camOther);
 
 		// if (SONG.song == 'South')
 		// FlxG.camera.alpha = 0.7;

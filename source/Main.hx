@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxG;
 import schmovin.SchmovinAdapter;
 import schmovin.SchmovinStandalone;
 import flixel.FlxGame;
@@ -13,6 +14,7 @@ class Main extends Sprite
 	{
 		super();
 		addChild(new FlxGame(0, 0, TitleState));
+		FlxG.fixedTimestep = false;
 
 		#if !mobile
 		addChild(new FPS(10, 3, 0xFFFFFF));
