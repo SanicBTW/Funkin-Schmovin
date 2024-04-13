@@ -1,11 +1,14 @@
 package;
 
+import schmovin.SchmovinAdapter;
+import schmovin.SchmovinStandalone;
 import flixel.FlxGame;
 import openfl.display.FPS;
 import openfl.display.Sprite;
 
 class Main extends Sprite
 {
+	public static var schmovin:SchmovinStandalone;
 	public function new()
 	{
 		super();
@@ -14,5 +17,8 @@ class Main extends Sprite
 		#if !mobile
 		addChild(new FPS(10, 3, 0xFFFFFF));
 		#end
+
+		SchmovinAdapter.SetInstance(new VSchmovinAdapter());
+		schmovin = new SchmovinStandalone();
 	}
 }

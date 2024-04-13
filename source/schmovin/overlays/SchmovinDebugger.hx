@@ -58,7 +58,7 @@ class ModSlider extends FlxBar
 	{
 		var ps = cast(FlxG.state, PlayState);
 		displayName = new FlxText(0, 0, 0, noteModName, 20);
-		displayName.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		displayName.setFormat("assets/fonts/vcr.ttf", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 
 		displayName.scrollFactor.set();
 		displayName.cameras = [ps.camHUD];

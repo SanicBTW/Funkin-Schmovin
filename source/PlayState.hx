@@ -58,18 +58,18 @@ class PlayState extends MusicBeatState
 	private var gf:Character;
 	private var boyfriend:Boyfriend;
 
-	private var notes:FlxTypedGroup<Note>;
-	private var unspawnNotes:Array<Note> = [];
+	public var notes:FlxTypedGroup<Note>;
+	public var unspawnNotes:Array<Note> = [];
 
-	private var strumLine:FlxSprite;
+	public var strumLine:FlxSprite;
 	private var curSection:Int = 0;
 
 	private var camFollow:FlxObject;
 
 	private static var prevCamFollow:FlxObject;
 
-	private var strumLineNotes:FlxTypedGroup<FlxSprite>;
-	private var playerStrums:FlxTypedGroup<FlxSprite>;
+	public var strumLineNotes:FlxTypedGroup<FlxSprite>;
+	public var playerStrums:FlxTypedGroup<FlxSprite>;
 
 	private var camZooming:Bool = false;
 	private var curSong:String = "";
@@ -86,8 +86,8 @@ class PlayState extends MusicBeatState
 
 	private var iconP1:HealthIcon;
 	private var iconP2:HealthIcon;
-	private var camHUD:FlxCamera;
-	private var camGame:FlxCamera;
+	public var camHUD:FlxCamera;
+	public var camGame:FlxCamera;
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
@@ -131,6 +131,7 @@ class PlayState extends MusicBeatState
 
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.add(camHUD);
+		Main.schmovin.AfterCameras(camGame, camHUD);
 
 		FlxCamera.defaultCameras = [camGame];
 
@@ -695,6 +696,7 @@ class PlayState extends MusicBeatState
 		scoreTxt.cameras = [camHUD];
 		doof.cameras = [camHUD];
 
+
 		// if (SONG.song == 'South')
 		// FlxG.camera.alpha = 0.7;
 		// UI_camera.zoom = 1;
@@ -755,6 +757,15 @@ class PlayState extends MusicBeatState
 		}
 
 		super.create();
+
+		Main.schmovin.PostUI(this);
+	}
+
+	override public function draw():Void
+	{
+		Main.schmovin.PreDraw(this);
+		super.draw();
+		Main.schmovin.PostDraw(this);
 	}
 
 	function schoolIntro(?dialogueBox:DialogueBox):Void
@@ -858,6 +869,7 @@ class PlayState extends MusicBeatState
 
 		var swagCounter:Int = 0;
 
+		Main.schmovin.OnCountdown(this);
 		startTimer = new FlxTimer().start(Conductor.crochet / 1000, function(tmr:FlxTimer)
 		{
 			dad.dance();
@@ -1033,7 +1045,7 @@ class PlayState extends MusicBeatState
 				susLength = susLength / Conductor.stepCrochet;
 				unspawnNotes.push(swagNote);
 
-				for (susNote in 0...Math.floor(susLength))
+				for (susNote in 0...Math.floor(susLength) + 1)
 				{
 					oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
 
@@ -1234,6 +1246,7 @@ class PlayState extends MusicBeatState
 
 	override public function update(elapsed:Float)
 	{
+		Main.schmovin.Update(this, elapsed);
 		#if !debug
 		perfectMode = false;
 		#end
@@ -1510,6 +1523,7 @@ class PlayState extends MusicBeatState
 				}
 
 				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(SONG.speed, 2)));
+				Main.schmovin.PostNotePosition(this, strumLine, daNote, SONG);
 
 				// i am so fucking sorry for this if condition
 				if (daNote.isSustainNote
@@ -1667,12 +1681,14 @@ class PlayState extends MusicBeatState
 				FlxG.sound.music.stop();
 
 				FlxG.switchState(new PlayState());
+				Main.schmovin.OnExitPlayState(new PlayState());
 			}
 		}
 		else
 		{
 			trace('WENT BACK TO FREEPLAY??');
 			FlxG.switchState(new FreeplayState());
+			Main.schmovin.OnExitPlayState(new FreeplayState());
 		}
 	}
 

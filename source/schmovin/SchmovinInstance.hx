@@ -183,7 +183,7 @@ class SchmovinInstance
 
 	function SwitchClient()
 	{
-		_client = new SchmovinClientNull(this, timeline, state);
+		_client = new SchmovinClientWithDebugger(this, timeline, state);
 		SchmovinAdapter.GetInstance().ForEveryMod([this, timeline, state]);
 	}
 
