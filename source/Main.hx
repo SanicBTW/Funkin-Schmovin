@@ -18,7 +18,7 @@ class Main extends Sprite
 		addChild(new FPS(10, 3, 0xFFFFFF));
 		#end
 
-		SchmovinAdapter.SetInstance(new VSchmovinAdapter());
+		SchmovinAdapter.setInstance(new VSchmovinAdapter());
 		schmovin = new SchmovinStandalone();
 	}
 }

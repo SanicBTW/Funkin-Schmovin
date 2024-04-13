@@ -65,6 +65,7 @@ class PlayState extends MusicBeatState
 	private var curSection:Int = 0;
 
 	private var camFollow:FlxObject;
+	private var camFollowPos:FlxObject;
 
 	private static var prevCamFollow:FlxObject;
 
@@ -130,8 +131,8 @@ class PlayState extends MusicBeatState
 		camHUD.bgColor.alpha = 0;
 
 		FlxG.cameras.reset(camGame);
+		Main.schmovin.afterCameras(camGame, camHUD);
 		FlxG.cameras.add(camHUD);
-		Main.schmovin.AfterCameras(camGame, camHUD);
 
 		FlxCamera.defaultCameras = [camGame];
 
@@ -641,19 +642,19 @@ class PlayState extends MusicBeatState
 
 		// add(strumLine);
 
-		camFollow = new FlxObject(0, 0, 1, 1);
-
-		camFollow.setPosition(camPos.x, camPos.y);
+		camFollow = new FlxObject(camPos.x, camPos.y, 1, 1);
+		camFollowPos = new FlxObject(camPos.x, camPos.y, 1, 1);
 
 		if (prevCamFollow != null)
 		{
-			camFollow = prevCamFollow;
+			camFollowPos = prevCamFollow;
 			prevCamFollow = null;
 		}
 
 		add(camFollow);
+		add(camFollowPos);
 
-		FlxG.camera.follow(camFollow, LOCKON, 0.04);
+		FlxG.camera.follow(camFollowPos, LOCKON, 0.04);
 		// FlxG.camera.setScrollBounds(0, FlxG.width, 0, FlxG.height);
 		FlxG.camera.zoom = defaultCamZoom;
 		FlxG.camera.focusOn(camFollow.getPosition());
@@ -696,6 +697,7 @@ class PlayState extends MusicBeatState
 		scoreTxt.cameras = [camHUD];
 		doof.cameras = [camHUD];
 
+		Main.schmovin.postUI(this);
 
 		// if (SONG.song == 'South')
 		// FlxG.camera.alpha = 0.7;
@@ -758,14 +760,13 @@ class PlayState extends MusicBeatState
 
 		super.create();
 
-		Main.schmovin.PostUI(this);
 	}
 
 	override public function draw():Void
 	{
-		Main.schmovin.PreDraw(this);
+		Main.schmovin.preDraw(this);
 		super.draw();
-		Main.schmovin.PostDraw(this);
+		Main.schmovin.postDraw(this);
 	}
 
 	function schoolIntro(?dialogueBox:DialogueBox):Void
@@ -869,7 +870,7 @@ class PlayState extends MusicBeatState
 
 		var swagCounter:Int = 0;
 
-		Main.schmovin.OnCountdown(this);
+		Main.schmovin.onCountdown(this);
 		startTimer = new FlxTimer().start(Conductor.crochet / 1000, function(tmr:FlxTimer)
 		{
 			dad.dance();
@@ -1246,7 +1247,7 @@ class PlayState extends MusicBeatState
 
 	override public function update(elapsed:Float)
 	{
-		Main.schmovin.Update(this, elapsed);
+		Main.schmovin.update(this, elapsed);
 		#if !debug
 		perfectMode = false;
 		#end
@@ -1274,6 +1275,9 @@ class PlayState extends MusicBeatState
 				}
 				// phillyCityLights.members[curLight].alpha -= (Conductor.crochet / 1000) * FlxG.elapsed;
 		}
+
+		var lerpVal:Float = FlxMath.bound(elapsed * 2.4 , 0, 1);
+		camFollowPos.setPosition(FlxMath.lerp(camFollowPos.x, camFollow.x, lerpVal), FlxMath.lerp(camFollowPos.y, camFollow.y, lerpVal));
 
 		super.update(elapsed);
 
@@ -1523,7 +1527,7 @@ class PlayState extends MusicBeatState
 				}
 
 				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(SONG.speed, 2)));
-				Main.schmovin.PostNotePosition(this, strumLine, daNote, SONG);
+				Main.schmovin.postNotePosition(this, strumLine, daNote, SONG);
 
 				// i am so fucking sorry for this if condition
 				if (daNote.isSustainNote
@@ -1681,14 +1685,14 @@ class PlayState extends MusicBeatState
 				FlxG.sound.music.stop();
 
 				FlxG.switchState(new PlayState());
-				Main.schmovin.OnExitPlayState(new PlayState());
+				Main.schmovin.onExitPlayState(new PlayState());
 			}
 		}
 		else
 		{
 			trace('WENT BACK TO FREEPLAY??');
 			FlxG.switchState(new FreeplayState());
-			Main.schmovin.OnExitPlayState(new FreeplayState());
+			Main.schmovin.onExitPlayState(new FreeplayState());
 		}
 	}
 

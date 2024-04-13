@@ -2,13 +2,12 @@
  * @ Author: 4mbr0s3 2
  * @ Create Time: 2021-06-22 11:55:58
  * @ Modified by: 4mbr0s3 2
- * @ Modified time: 2021-11-14 10:33:21
+ * @ Modified time: 2022-04-03 01:04:16
  */
 
 package schmovin;
 
 import Song.SwagSong;
-import flixel.FlxBasic;
 import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -18,9 +17,9 @@ import flixel.util.FlxColor;
 import groovin.mod.Mod;
 import groovin.mod.ModHooks;
 import groovin.mod_options.GroovinModOptionsClasses.GroovinModOption;
+import groovin.mod_options.GroovinModOptionsClasses.GroovinModOptionCheckbox;
 import groovin.mod_options.GroovinModOptionsClasses.GroovinModOptionSectionTitle;
 import groovin.mod_options.GroovinModOptionsClasses.GroovinModOptionSlider;
-import groovin.util.GroovinConductor;
 
 using SchmovinUtil.SchmovinUtil;
 
@@ -29,136 +28,106 @@ class Schmovin extends Mod
 	private var instance:SchmovinInstance;
 
 	public static var holdNoteSubdivisions:Int = 4;
+	public static var arrowPathSubdivisions:Int = 80;
+	public static var optimizeHoldNotes:Bool = false;
 
-	override function GetCredits():String
+	override function getCredits():String
 	{
 		return '4mbr0s3 2';
 	}
 
-	override function Initialize()
+	override function initialize()
 	{
-		Hook(ModHooks.HookAfterCameras);
-		Hook(ModHooks.HookUpdate);
-		Hook(ModHooks.HookPostNotePosition);
-		Hook(ModHooks.HookPreDraw);
-		Hook(ModHooks.HookPostDraw);
-		Hook(ModHooks.HookPostUI);
-		Hook(ModHooks.HookOnCountdown);
-		Hook(ModHooks.HookSetupCharacters);
-		Hook(ModHooks.HookOnExitPlayState);
+		hook(ModHooks.hookAfterCameras);
+		hook(ModHooks.hookUpdate);
+		hook(ModHooks.hookPostNotePosition);
+		hook(ModHooks.hookPreDraw);
+		hook(ModHooks.hookPostDraw);
+		hook(ModHooks.hookPostUI);
+		hook(ModHooks.hookOnCountdown);
+		hook(ModHooks.hookSetupCharacters);
+		hook(ModHooks.hookOnExitPlayState);
 	}
 
-	override function ShouldRun():Bool
+	override function shouldRun():Bool
 	{
 		if (Std.is(FlxG.state.subState, PauseSubState))
 			return true;
 		return FlxG.state.subState == null;
 	}
 
-	override function OnGameOver(state:PlayState)
+	override function onGameOver(state:PlayState)
 	{
-		instance.Destroy();
+		instance.destroy();
 	}
 
-	function InitializeGroovinSchmovinAdapter()
+	private function initializeGroovinSchmovinAdapter()
 	{
-		SchmovinAdapter.SetInstance(new GroovinSchmovinAdapter());
+		SchmovinAdapter.setInstance(new GroovinSchmovinAdapter());
 	}
 
-	override function AfterCameras(camGame:FlxCamera, camHUD:FlxCamera)
+	override function afterCameras(camGame:FlxCamera, camHUD:FlxCamera)
 	{
-		InitializeGroovinSchmovinAdapter();
+		initializeGroovinSchmovinAdapter();
 
-		instance = SchmovinInstance.Create();
-		instance.state = cast FlxG.state;
-
-		instance.camHUD = camHUD;
-		instance.camGame = camGame;
-		InitializeCamBelowGame();
-
-		instance.InitializeCameras();
-		instance.InitializeSchmovin();
+		instance = SchmovinInstance.create(cast FlxG.state, camHUD, camGame);
+		instance.initialize();
 	}
 
-	function InitializeCamBelowGame()
+	override function onExitPlayState(nextState:FlxState)
 	{
-		instance.camBelowGame = new FlxCamera();
-		instance.camBelowGame.bgColor = FlxColor.TRANSPARENT;
-		FlxG.cameras.add(instance.camBelowGame);
-		instance.layerBelowGame = new FlxTypedGroup<FlxBasic>();
-		instance.layerBelowGame.cameras = [instance.camBelowGame];
-		instance.state.add(instance.layerBelowGame);
+		Log('Destroying Schmovin instance...');
+		instance.destroy();
 	}
 
-	override function OnExitPlayState(nextState:FlxState)
-	{
-		Log('PlayState exited...');
-		instance.Destroy();
-	}
-
-	function InitializeAboveHUD()
-	{
-		instance.layerAboveHUD = new FlxTypedGroup<FlxBasic>();
-		instance.layerAboveHUD.cameras = [instance.camHUD];
-		instance.state.add(instance.layerAboveHUD);
-	}
-
-	override function PostUI(state:PlayState)
+	override function postUI(state:PlayState)
 	{
 		state.strumLineNotes.cameras = [instance.camNotes];
 		state.notes.cameras = [instance.camNotes];
-
 		FlxCamera.defaultCameras = [instance.camGameCopy];
-		InitializeAboveHUD();
+
+		instance.initializeAboveHUD();
 	}
 
-	override function PreDraw(state:PlayState)
+	override function preDraw(state:PlayState)
 	{
-		if (instance.camPath == null)
-			return;
-		instance.notePathRenderer.PreDraw();
+		instance.preDraw();
 	}
 
-	override function PostDraw(state:PlayState)
+	override function postDraw(state:PlayState)
 	{
-		if (instance.camPath == null)
-			return;
-		instance.holdNoteRenderer.PreDraw();
+		instance.postDraw();
 	}
 
-	override function OnCountdown(state:PlayState)
+	override function onCountdown(state:PlayState)
 	{
-		instance.InitializeFakeExplosionReceptors();
+		// No longer needed
+		// instance.initializeFakeExplosionReceptors();
 	}
 
-	override function Update(elapsed:Float)
+	override function update(elapsed:Float)
 	{
-		instance.Update(elapsed);
-		UpdateReceptors();
+		instance.update(elapsed);
+		hideReceptors();
 	}
 
-	function UpdateReceptors()
+	private function hideReceptors()
 	{
-		var currentBeat = GetCurrentBeat();
 		for (receptorIndex in 0...instance.state.strumLineNotes.length)
 		{
+			// Note positioning moved to SchmovinRenderers for multiple playfield support
+			// This is for updating receptor positions...
 			var receptor = instance.state.strumLineNotes.members[receptorIndex];
-			instance.timeline.UpdateNotes(currentBeat, receptor, SchmovinUtil.GetPlayerOfTotalColumn(receptorIndex), receptorIndex);
+			receptor.visible = false;
 		}
-		instance.UpdateFakeExplosionReceptors();
 	}
 
-	override function IsVisibleOnModList():Bool
+	override function isVisibleOnModList():Bool
 	{
 		return false;
 	}
 
-	public static function GetCurrentBeat()
-	{
-		return SchmovinAdapter.GetInstance().GetCurrentBeat();
-	}
-
-	override function RegisterModOptions():Array<GroovinModOption<Dynamic>>
+	override function registerModOptions():Array<GroovinModOption<Dynamic>>
 	{
 		return [
 			new GroovinModOptionSectionTitle(this, 'Visual'),
@@ -166,13 +135,28 @@ class Schmovin extends Mod
 			{
 				holdNoteSubdivisions = cast v;
 			}, 1, 4, '', true),
+			new GroovinModOptionSlider(this, 'maxArrowPathSubdivisions', 'Maximum Arrow Path Subdivisions', 80, 10, 100, (v) ->
+			{
+				arrowPathSubdivisions = cast v;
+			}, 1, 80, '', true),
+			new GroovinModOptionCheckbox(this, 'optimizeSustainNotes', 'Optimize Sustain Notes', false, (v) ->
+			{
+				optimizeHoldNotes = cast v;
+			}, false,
+				'Reduces the number of times paths are calculated for sustain (hold) notes by 1. Boosts framerate by about 10 FPS.')
 		];
 	}
 
-	override function PostNotePosition(state:PlayState, strumLine:FlxSprite, daNote:Note, SONG:SwagSong):Bool
+	override function postNotePosition(state:PlayState, strumLine:FlxSprite, daNote:Note, SONG:SwagSong):Bool
 	{
-		if (daNote.alive && daNote.visible)
-			instance.timeline.UpdateNotes(GetCurrentBeat(), daNote, daNote.GetPlayer());
+		// Note positioning moved to SchmovinRenderers for multiple playfield support
+
+		if (daNote.alive)
+		{
+			daNote.visible = false;
+			daNote.cameras = [];
+		}
+
 		return true;
 	}
 }

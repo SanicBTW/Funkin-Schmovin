@@ -1,54 +1,45 @@
 package;
 
+import flixel.FlxG;
+import schmovin.SchmovinUtil;
 import schmovin.SchmovinAdapter;
 
 // Vanilla Schmovin Adapter
 class VSchmovinAdapter extends SchmovinAdapter
 {
-    override function ForEveryMod(param:Array<Dynamic>)
+    override function forEveryMod(param:Array<Dynamic>)
 	{
 		trace(param);
 	}
 
 	// TODO
-	override function GetCrotchetAtTime(time:Float):Float
+	override function getCrotchetAtTime(time:Float):Float
 	{
 		return 2.0;
 	}
 
-	override function GrabScrollSpeed():Float
+	override function grabScrollSpeed():Float
 	{
         return PlayState.SONG.speed;
 	}
 
-	// TODO
-	override function GrabReverse():Bool
-	{
-		return false;
-	}
-
-	override function GetCrotchetNow():Float
+	override function getCrotchetNow():Float
 	{
 		return Conductor.crochet;
 	}
 
-	override function GetSongPosition():Float
+	override function getSongPosition():Float
 	{
 		return Conductor.songPosition;
 	}
 
-	override function GrabGlobalVisualOffset():Float
+	override function getDefaultNoteX(column:Int, player:Int)
 	{
-		return 0.0;
+		var playerColumn = column % 4;
+		return SchmovinUtil.getNoteWidthHalf() + 50 + playerColumn * Note.swagWidth + FlxG.width / 2 * player;
 	}
 
-	override function GetHoldNoteSubdivisions():Int
-	{
-		return 4;
-	}
-
-
-	override function Log(string:Dynamic)
+	override function log(string:Dynamic)
 	{
 		trace('[Schmovin\' Vanilla Adapter] $string');
 	}
