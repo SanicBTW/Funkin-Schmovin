@@ -133,10 +133,10 @@ class SchmovinDebugger extends Sprite
 		_timeline._mods.itgParseApplyModifiers(stringOptions, player);
 	}
 
-	public function addAllTheSliders(player:Int)
+	public function addAllTheSliders(player:Int = -1)
 	{
 		@:privateAccess
-		for (mod in _timeline._mods._auxModsOrder)
+		for (mod in _timeline._mods._modsOrder)
 		{
 			addSlider(mod, player);
 		}

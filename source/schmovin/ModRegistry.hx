@@ -13,6 +13,7 @@ import schmovin.note_mods.ISchmovinNoteMod;
 import schmovin.note_mods.NoteModBase;
 import schmovin.note_mods.NoteModBeat;
 import schmovin.note_mods.NoteModBlink;
+import schmovin.note_mods.NoteModBounce;
 import schmovin.note_mods.NoteModBumpy;
 import schmovin.note_mods.NoteModColumnSwaps;
 import schmovin.note_mods.NoteModConfusion;
@@ -138,6 +139,7 @@ class ModRegistry
 		addNoteMod('translation', new NoteModTranslate());
 
 		addNoteMod('zigzag', new NoteModZigzag());
+		addNoteMod('bounce', new NoteModBounce());
 		addNoteMod('square', new NoteModSquare());
 
 		addNoteMod('gantzgraf', new NoteModGantzGraf());
