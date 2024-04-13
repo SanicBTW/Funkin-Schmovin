@@ -34,9 +34,6 @@ class SchmovinInstance
 	public var camPath:FlxCameraCopy;
 	public var camNotes:FlxCameraCopy;
 
-	public var planeRaymarcher:PlaneRaymarcher;
-	public var planeRaymarcherFilter:ShaderFilter;
-
 	public var timeline:SchmovinTimeline;
 	public var playfields:SchmovinPlayfieldManager;
 
@@ -200,9 +197,6 @@ class SchmovinInstance
 		layerAboveGame = new FlxTypedGroup<FlxBasic>();
 		layerAboveGame.cameras = [camAboveGame];
 		state.add(layerAboveGame);
-
-		planeRaymarcher = new PlaneRaymarcher();
-		planeRaymarcherFilter = new ShaderFilter(planeRaymarcher.shader);
 
 		camPath = new FlxCameraCopy(state.camHUD);
 		camPath.bgColor = FlxColor.TRANSPARENT;
