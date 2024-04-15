@@ -1539,6 +1539,7 @@ class PlayState extends MusicBeatState
 				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(SONG.speed, 2)));
 				Main.schmovin.postNotePosition(this, strumLine, daNote, SONG);
 
+				/* so apparently, this was causing the issue to always show up the sustain ends? - ok it didnt
 				// i am so fucking sorry for this if condition
 				if (daNote.isSustainNote
 					&& daNote.y + daNote.offset.y <= strumLine.y + Note.swagWidth / 2
@@ -1549,7 +1550,7 @@ class PlayState extends MusicBeatState
 					swagRect.height -= swagRect.y;
 
 					daNote.clipRect = swagRect;
-				}
+				}*/
 
 				if (!daNote.mustPress && daNote.wasGoodHit)
 				{

@@ -257,7 +257,7 @@ class SchmovinTapNoteRenderer extends SchmovinRenderer
 				var pos = _timeline.getPath(currentBeat, strumTime, column, player, playfield, ['cam']);
 
 				// TODO: Move to main update loop
-				_timeline.updateNote(_instance.playfields.getPlayfieldAtIndex(player), currentBeat, sprite, pos, player, column);
+				// _timeline.updateNote(_instance.playfields.getPlayfieldAtIndex(player), currentBeat, sprite, pos, player, column);
 
 				var quad = getQuadAlongPath(strumTime, pos, playfield, sprite, column, player, sprite.frameWidth * sprite.scale.x,
 					sprite.frameHeight * sprite.scale.y);
